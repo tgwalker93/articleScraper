@@ -100,25 +100,25 @@ $(document).ready(function() {
       // Also setting up a currentNote variable to temporarily store each note
       var notesToRender = [];
       var currentNote;
-      if (!data.notes.length) {
+      if (!data.notes.notes) {
         // If we have no notes, just display a message explaing this
         currentNote = ["<li class='list-group-item'>", "No notes for this article yet.", "</li>"].join("");
         notesToRender.push(currentNote);
       }
       else {
         // If we do have notes, go through each one
-        for (var i = 0; i < data.notes.length; i++) {
+        for (var i = 0; i < data.notes.notes.length; i++) {
           // Constructs an li element to contain our noteText and a delete button
           currentNote = $(
             [
               "<li class='list-group-item note'>",
-              data.notes[i].noteText,
+              data.notes.notes[i].noteText,
               "<button class='btn btn-danger note-delete'>x</button>",
               "</li>"
             ].join("")
           );
           // Store the note id on the delete button for easy access when trying to delete
-          currentNote.children("button").data("_id", data.notes[i]._id);
+          currentNote.children("button").data("_id", data.notes.notes[i]._id);
           // Adding our currentNote to the notesToRender array
           notesToRender.push(currentNote);
         }
@@ -189,7 +189,7 @@ $(document).ready(function() {
       // and post it to the "/api/notes" route and send the formatted noteData as well
       if (newNote) {
         noteData = {
-          _id: $(this).data("article")._id,
+          id: $(this).data("article")._id,
           noteText: newNote
         };
         $.post("/api/notes", noteData).then(function() {

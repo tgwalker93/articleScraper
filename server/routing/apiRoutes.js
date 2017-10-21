@@ -19,6 +19,56 @@ var Article = require("../models/Article.js");
 
 // Routes
 // //======
+//save a new note
+app.post("/api/notes", function(req, res){
+  // Create a new note and pass the req.body to the entry
+  var newNote = new Note(req.body);
+  
+    // And save the new note the db
+    newNote.save(function(error, doc) {
+      // Log any errors
+      if (error) {
+        console.log(error);
+      }
+      // Otherwise
+      else {
+        // Use the article id to find and update it's note
+        Article.findOneAndUpdate({ "_id": req.body.id }, {$push: {"notes": doc._id}},
+        {safe: true, upsert: true})
+        // Execute the above query
+        .exec(function(err, doc) {
+          // Log any errors
+          if (err) {
+            console.log(err);
+          }
+          else {
+            // Or send the document to the browser
+            res.send(doc);
+          }
+        });
+      }
+    });
+
+});
+
+//search notes by article id
+app.get("/api/notes/:id", function(req, res){
+    // Using the id passed in the id parameter, prepare a query that finds the matching one in our db...
+    Article.findOne({ "_id": req.params.id })
+    // ..and populate all of the notes associated with it
+    .populate("notes")
+    // now, execute our query
+    .exec(function(error, doc) {
+      // Log any errors
+      if (error) {
+        console.log(error);
+      }
+      // Otherwise, send the doc to the browser as a json object
+      else {
+        res.json(doc);
+      }
+    });
+});
 app.delete("/api/headlines/:id", function(req, res){
   Article.findByIdAndRemove(req.params.id, function(error, doc){
       // Log any errors
