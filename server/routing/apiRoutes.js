@@ -88,6 +88,28 @@ app.get("/api/notes/:id", function(req, res){
 
 
 //HEADLINES BEGIN -----------------------------------------------------
+app.post("/api/saveAllArticles", function(req, res){
+  var result = JSON.parse(req.body.articles);
+  for(i=0; i<result.length; i++){
+      // Using our Article model, create a new entry
+  // This effectively passes the result object to the entry (and the title and link)
+    var entry = new Article(result[i]);
+  
+        // Now, save that entry to the db
+        entry.save(function(err, doc) {
+          // Log any errors
+          if (err) {
+            console.log(err);
+          }
+          // Or log the doc
+          else {
+            console.log(doc);
+          }
+        });
+
+  }
+
+});
 app.delete("/api/headlines/:id", function(req, res){
   Article.findByIdAndRemove(req.params.id, function(error, doc){
       // Log any errors
@@ -142,7 +164,7 @@ app.post("/api/headlines", function(req, res) {
 app.get("/api/headlines", function(req, res) {
 
     // First, we grab the body of the html with request
-    request("http://www.echojs.com/", function(error, response, html) {
+    request("http://www.nytimes.com/pages/todayspaper/index.html", function(error, response, html) {
       
             // If the request is successful
           if (!error && response.statusCode === 200) {
@@ -153,13 +175,14 @@ app.get("/api/headlines", function(req, res) {
          var result = {
            articles: []
          };
-            $("article h2").each(function(i, element) {
+            $(".story").each(function(i, element) {
               var article = {
 
               }
               // Add the text and href of every link, and save them as properties of the result object
-              article.title = $(this).children("a").text();
-              article.link = $(this).children("a").attr("href");
+              article.title = $(this).children("h3").text();
+              article.link = $(this).children("h3").children("a").attr("href");
+              article.summary = $(this).children("p").text();
               article.saved = false;
               article.id = i;
               result.articles.push(article);
