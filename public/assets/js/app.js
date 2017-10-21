@@ -167,7 +167,7 @@ function newsScraper() {
     );
     // We attach the article's id to the jQuery element
     // We will use this when trying to figure out which article the user wants to save
-    panel.data("_id", article._id);
+    panel.data("id", article.id);
     // We return the constructed panel jQuery element
     return panel;
   }
@@ -201,11 +201,13 @@ function newsScraper() {
     // to the element using the .data method. Here we retrieve that.
     var articleToSave = $(this).parents(".panel").data();
     articleToSave.saved = true;
+    currentArticles[articleToSave.id].save = true;
+
     // Using a patch method to be semantic since this is an update to an existing record in our collection
     $.ajax({
-      method: "PUT",
+      method: "POST",
       url: "/api/headlines",
-      data: articleToSave
+      data: currentArticles[articleToSave.id]
     }).then(function(data) {
       // If successful, mongoose will send back an object containing a key of "ok" with the value of 1
       // (which casts to 'true')

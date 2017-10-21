@@ -19,6 +19,51 @@ var Article = require("../models/Article.js");
 
 // Routes
 // //======
+app.delete("/api/headlines/:id", function(req, res){
+  Article.findByIdAndRemove(req.params.id, function(error, doc){
+      // Log any errors
+      if (error) {
+        console.log(error);
+      }
+      else {
+        // Or send the document to the browser
+        res.send(doc);
+      }
+  })
+}
+
+)
+app.get("/api/renderSaved", function(req, res) {
+  Article.find({}, function(error, doc) {
+    // Log any errors
+    if (error) {
+      console.log(error);
+    }
+    // Or send the doc to the browser as a json object
+    else {
+      res.json(doc);
+    }
+  });
+});
+app.post("/api/headlines", function(req, res) {
+  var result = req.body;
+  // Using our Article model, create a new entry
+  // This effectively passes the result object to the entry (and the title and link)
+  var entry = new Article(result);
+  
+        // Now, save that entry to the db
+        entry.save(function(err, doc) {
+          // Log any errors
+          if (err) {
+            console.log(err);
+          }
+          // Or log the doc
+          else {
+            console.log(doc);
+          }
+        });
+
+});
 app.get("/api/headlines", function(req, res) {
 
     // First, we grab the body of the html with request
@@ -41,6 +86,7 @@ app.get("/api/headlines", function(req, res) {
               article.title = $(this).children("a").text();
               article.link = $(this).children("a").attr("href");
               article.saved = false;
+              article.id = i;
               result.articles.push(article);
      
             });
