@@ -6,6 +6,7 @@ app.get("/", function(req, res) {
     res.sendFile(path.join(__dirname, "../../public/index.html"));
   });
 
+//route for saved articles
 app.get("/saved", function(req, res) {
 res.sendFile(path.join(__dirname, "../../public/saved.html"));
 });
